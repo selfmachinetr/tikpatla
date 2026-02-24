@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikPatla — TikTok'ta Patla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0e8;
+    --pink: #ff2d55;
+    --cyan: #00f5d4;
+    --yellow: #ffdd00;
+    --purple: #7b2fff;
+    --gray: #1a1a1a;
+    --gray2: #2a2a2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--pink);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-trail {
+    width: 36px; height: 36px;
+    border: 1px solid var(--cyan);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: top 0.15s ease, left 0.15s ease;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.3;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    background: rgba(10,10,10,0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .logo span { color: var(--pink); }
+
+  .nav-btn {
+    background: var(--pink);
+    color: var(--black);
+    border: none;
+    padding: 10px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: none;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover {
+    background: var(--cyan);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--pink);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(120px, 25vw, 400px);
+    color: rgba(255,255,255,0.02);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: -5px;
+    animation: drift 20s ease-in-out infinite;
+  }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
+    50% { transform: translate(-50%, -52%) rotate(1deg); }
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--cyan);
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 12vw, 160px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .hero h1 .line1 { color: var(--white); display: block; }
+  .hero h1 .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--pink);
+    display: block;
+  }
+  .hero h1 .line3 {
+    color: var(--yellow);
+    display: block;
+    position: relative;
+  }
+  .hero h1 .line3::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 3px; top: 3px;
+    color: var(--pink);
+    z-index: -1;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    color: rgba(245,240,232,0.6);
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-sub strong {
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--pink);
+    color: var(--black);
+    border: none;
+    padding: 18px 40px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: none;
+    position: relative;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; right: -5px;
+    width: 100%; height: 100%;
+    border: 1.5px solid var(--pink);
+    z-index: -1;
+    transition: all 0.15s;
+  }
+  .btn-primary:hover {
+    transform: translate(-3px, -3px);
+  }
+  .btn-primary:hover::after {
+    bottom: -8px; right: -8px;
+  }
+
+  .hero-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+  }
+
+  /* STATS TICKER */
+  .ticker {
+    background: var(--pink);
+    padding: 14px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 25s linear infinite;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--black);
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .ticker-sep { margin: 0 24px; opacity: 0.4; }
+
+  /* PROBLEM */
+  .problem {
+    padding: 100px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+  }
+
+  .problem-card {
+    background: var(--gray);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .problem-card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: -20px; right: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+  }
+  .problem-card:hover {
+    background: var(--gray2);
+    transform: translateY(-4px);
+  }
+  .problem-card:hover .problem-icon { color: var(--pink); }
+
+  .problem-icon {
+    font-size: 32px;
+    margin-bottom: 20px;
+    display: block;
+    transition: 0.3s;
+  }
+
+  .problem-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    color: var(--white);
+  }
+  .problem-card p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+  }
+
+  /* HOW */
+  .how {
+    padding: 100px 40px;
+    background: linear-gradient(180deg, var(--black) 0%, #0d0510 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(123,47,255,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .how-inner { max-width: 1100px; margin: 0 auto; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.05);
+    margin-top: 60px;
+  }
+
+  .step {
+    background: var(--black);
+    padding: 48px 36px;
+    position: relative;
+  }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+
+  .step h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .step:nth-child(1) h3 { color: var(--cyan); }
+  .step:nth-child(2) h3 { color: var(--pink); }
+  .step:nth-child(3) h3 { color: var(--yellow); }
+
+  .step p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.8;
+  }
+
+  /* FEATURES */
+  .features {
+    padding: 100px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .feature {
+    padding: 40px;
+    background: var(--gray);
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .feature:hover { border-left-color: var(--pink); background: var(--gray2); }
+  .feature:nth-child(2):hover { border-left-color: var(--cyan); }
+  .feature:nth-child(3):hover { border-left-color: var(--yellow); }
+  .feature:nth-child(4):hover { border-left-color: var(--purple); }
+
+  .feature-emoji {
+    font-size: 40px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .feature h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .feature p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+  }
+
+  /* SOCIAL PROOF */
+  .proof {
+    padding: 100px 40px;
+    background: var(--gray);
+    overflow: hidden;
+  }
+
+  .proof-inner { max-width: 1100px; margin: 0 auto; }
+
+  .proof-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .proof-card {
+    background: var(--black);
+    padding: 32px;
+    position: relative;
+    transition: transform 0.3s;
+  }
+  .proof-card:hover { transform: translateY(-4px); }
+
+  .proof-card::before {
+    content: '"';
+    position: absolute;
+    top: 16px; left: 24px;
+    font-size: 80px;
+    font-family: 'Bebas Neue', sans-serif;
+    color: rgba(255,45,85,0.15);
+    line-height: 1;
+  }
+
+  .proof-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 24px;
+    padding-top: 16px;
+  }
+
+  .proof-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .proof-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .proof-name {
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .proof-handle {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .proof-stat {
+    position: absolute;
+    top: 24px; right: 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--pink);
+  }
+
+  /* PRICING */
+  .pricing {
+    padding: 100px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .plan {
+    background: var(--gray);
+    padding: 48px 36px;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .plan.featured {
+    background: var(--pink);
+    color: var(--black);
+  }
+
+  .plan-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--yellow);
+    color: var(--black);
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+
+  .plan-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .plan-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .plan-price sup {
+    font-size: 28px;
+    vertical-align: top;
+    margin-top: 16px;
+  }
+  .plan-period {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-bottom: 36px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .plan-features-list {
+    list-style: none;
+    margin-bottom: 36px;
+  }
+  .plan-features-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .plan.featured .plan-features-list li {
+    border-bottom-color: rgba(0,0,0,0.1);
+  }
+  .plan-features-list li::before {
+    content: '→';
+    font-family: 'Space Mono', monospace;
+    opacity: 0.5;
+  }
+
+  .btn-plan {
+    width: 100%;
+    padding: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    border: 2px solid var(--white);
+    background: transparent;
+    color: var(--white);
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .btn-plan:hover {
+    background: var(--white);
+    color: var(--black);
+  }
+  .plan.featured .btn-plan {
+    border-color: var(--black);
+    color: var(--black);
+  }
+  .plan.featured .btn-plan:hover {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  /* WAITLIST */
+  .waitlist {
+    padding: 120px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .waitlist::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(255,45,85,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .waitlist h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 10vw, 120px);
+    letter-spacing: -1px;
+    line-height: 0.9;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .waitlist h2 em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--pink);
+  }
+
+  .waitlist p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 48px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .waitlist-form {
+    display: flex;
+    gap: 0;
+    max-width: 480px;
+    margin: 0 auto 24px;
+  }
+
+  .waitlist-form input {
+    flex: 1;
+    padding: 18px 24px;
+    background: var(--gray);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-right: none;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .waitlist-form input:focus {
+    border-color: var(--pink);
+  }
+  .waitlist-form input::placeholder {
+    color: rgba(255,255,255,0.2);
+  }
+
+  .waitlist-form button {
+    padding: 18px 32px;
+    background: var(--pink);
+    color: var(--black);
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    cursor: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .waitlist-form button:hover { background: var(--yellow); }
+
+  .waitlist-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+  }
+
+  .success-msg {
+    display: none;
+    background: var(--cyan);
+    color: var(--black);
+    padding: 18px 32px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+  .footer-logo span { color: var(--pink); }
+
+  .footer-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+  }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero h1 { font-size: clamp(52px, 16vw, 100px); }
+    .steps { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .problem { padding: 60px 20px; }
+    .how, .features, .pricing, .waitlist { padding: 60px 20px; }
+    .proof { padding: 60px 20px; }
+    .waitlist-form { flex-direction: column; }
+    .waitlist-form input { border-right: 1px solid rgba(255,255,255,0.1); border-bottom: none; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Tik<span>Patla</span></a>
+  <button class="nav-btn" onclick="document.getElementById('waitlist-section').scrollIntoView({behavior:'smooth'})">Listeye Katıl</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">VIRAL</div>
+  <div class="hero-tag">AI destekli TikTok büyüme motoru</div>
+  <h1>
+    <span class="line1">TikTok'ta</span>
+    <span class="line2">Kaybolmak</span>
+    <span class="line3" data-text="BİTTİ.">BİTTİ.</span>
+  </h1>
+  <p class="hero-sub">
+    AI hesabını analiz ediyor, <strong>senin tarzında</strong> viral hook'lar, caption'lar ve hashtag setleri üretiyor. Algoritma seni görmezden gelemez.
+  </p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('waitlist-section').scrollIntoView({behavior:'smooth'})">Ücretsiz Dene →</button>
+    <span class="hero-note">Kredi kartı gerekmez</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    500K+ Takipçi Üretildi <span class="ticker-sep">✦</span> 2M+ Video Görüntülenme <span class="ticker-sep">✦</span> 10K+ Viral Hook <span class="ticker-sep">✦</span> 1.200+ Aktif Kullanıcı <span class="ticker-sep">✦</span> 500K+ Takipçi Üretildi <span class="ticker-sep">✦</span> 2M+ Video Görüntülenme <span class="ticker-sep">✦</span> 10K+ Viral Hook <span class="ticker-sep">✦</span> 1.200+ Aktif Kullanıcı <span class="ticker-sep">✦</span> 500K+ Takipçi Üretildi <span class="ticker-sep">✦</span> 2M+ Video Görüntülenme <span class="ticker-sep">✦</span> 10K+ Viral Hook <span class="ticker-sep">✦</span> 1.200+ Aktif Kullanıcı <span class="ticker-sep">✦</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="section-label">Problem</div>
+  <div class="problem-grid">
+    <div class="problem-card fade-up" data-num="01">
+      <span class="problem-icon">🕐</span>
+      <h3>Saatler Harcıyorsun</h3>
+      <p>Her gün ne çekeceğini düşünmek için saatlerini harcıyorsun. Sonunda videoyu çekiyorsun ama kimse izlemiyor.</p>
+    </div>
+    <div class="problem-card fade-up" data-num="02">
+      <span class="problem-icon">👻</span>
+      <h3>Algoritma Seni Görmüyor</h3>
+      <p>İçeriğin iyi ama TikTok seni kimseye göstermiyor. Doğru hook, doğru ses, doğru saat olmadan şans yok.</p>
+    </div>
+    <div class="problem-card fade-up" data-num="03">
+      <span class="problem-icon">📈</span>
+      <h3>Rakiplerin Patlıyor</h3>
+      <p>Aynı nişte hesaplar gecelik 100K takipçi alırken sen 47 takipçide takılı kaldın. Bir şeyleri kaçırıyorsun.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="how-inner">
+    <div class="section-label">Nasıl Çalışır</div>
+    <div class="steps">
+      <div class="step fade-up">
+        <div class="step-num">01</div>
+        <h3>Hesabını Bağla</h3>
+        <p>TikTok kullanıcı adını gir. AI geçmiş videolarını, etkileşim oranlarını ve tarzını analiz eder. 2 dakika yeter.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">02</div>
+        <h3>Video Tarifi Al</h3>
+        <p>Hangi konuda video çekeceğini söyle. AI sana hook cümlesi, video yapısı, caption ve tam hashtag seti üretir. Senin tarzında.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">03</div>
+        <h3>Çek & Patla</h3>
+        <p>En iyi saatte paylaş. Trend seslere katıl. Büyük hesaplara akıllı duet önerileri al. Algoritma artık senin arkanda.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">Özellikler</div>
+  <div class="features-grid">
+    <div class="feature fade-up">
+      <span class="feature-emoji">🎣</span>
+      <h3>Viral Hook Üretici</h3>
+      <p>İlk 3 saniye her şey. AI tarzını öğreniyor ve senin gibi konuşan, durdurulamaz hook'lar üretiyor. Kaydırma refleksi kırılıyor.</p>
+    </div>
+    <div class="feature fade-up">
+      <span class="feature-emoji">🔊</span>
+      <h3>Trend Ses Eşleştirme</h3>
+      <p>Şu an patlayan sesleri gerçek zamanlı takip ediyor. Hangi ses senin nişinde viral, hangisi ölmüş? Hepsini biliyor.</p>
+    </div>
+    <div class="feature fade-up">
+      <span class="feature-emoji">⏰</span>
+      <h3>Optimal Paylaşım Saati</h3>
+      <p>Takipçilerin ne zaman online? Hangi saatte paylaşırsan ilk 1 saatte en fazla etkileşimi alırsın? Hesaplıyor.</p>
+    </div>
+    <div class="feature fade-up">
+      <span class="feature-emoji">🧬</span>
+      <h3>Stil Klonlama</h3>
+      <p>Hesabını analiz ediyor, sen gibi düşünüyor. Robot caption değil — gerçekten senin sesinde, senin hümörünle yazıyor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof">
+  <div class="proof-inner">
+    <div class="section-label">Gerçek Sonuçlar</div>
+    <div class="proof-grid">
+      <div class="proof-card fade-up">
+        <div class="proof-stat">+47K</div>
+        <p class="proof-text">3 haftada 47K takipçi geldim. TikPatla'dan önce 2 yıldır 800 takipçide sıkışmıştım. Hook önerisi hayatımı değiştirdi.</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:#ff2d55;color:#000;">ZK</div>
+          <div>
+            <div class="proof-name">Zeynep K.</div>
+            <div class="proof-handle">@zeynepvibes</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card fade-up">
+        <div class="proof-stat">2.1M</div>
+        <p class="proof-text">İlk önerilen video 2.1 milyon görüntülenme aldı. Şaka gibi. AI benim tarzımda yazdı, ben sadece çektim.</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:#00f5d4;color:#000;">MA</div>
+          <div>
+            <div class="proof-name">Mert A.</div>
+            <div class="proof-handle">@mertcreates</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card fade-up">
+        <div class="proof-stat">+12K</div>
+        <p class="proof-text">Moda hesabımı büyütmek için 6 ay uğraştım. TikPatla ile 12K takipçi 10 günde geldi. Trend ses özelliği bomb.</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:#ffdd00;color:#000;">EY</div>
+          <div>
+            <div class="proof-name">Elif Y.</div>
+            <div class="proof-handle">@elifstyle_</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Fiyatlar</div>
+  <div class="pricing-grid">
+    <div class="plan fade-up">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price"><sup>₺</sup>99</div>
+      <div class="plan-period">/ay • aylık faturalanır</div>
+      <ul class="plan-features-list">
+        <li>Aylık 200 Hook üretimi</li>
+        <li>Hesap analizi</li>
+        <li>Hashtag seti</li>
+        <li>Optimal paylaşım saati</li>
+        <li>1 hesap</li>
+      </ul>
+      <button class="btn-plan" onclick="document.getElementById('waitlist-section').scrollIntoView({behavior:'smooth'})">Başla</button>
+    </div>
+    <div class="plan featured fade-up">
+      <div class="plan-badge">En Popüler</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price"><sup>₺</sup>249</div>
+      <div class="plan-period">/ay • aylık faturalanır</div>
+      <ul class="plan-features-list">
+        <li>Sınırsız Hook üretimi</li>
+        <li>Trend ses eşleştirme</li>
+        <li>Stil klonlama (tam)</li>
+        <li>Duet & Stitch önerileri</li>
+        <li>3 hesap • Öncelikli destek</li>
+      </ul>
+      <button class="btn-plan" onclick="document.getElementById('waitlist-section').scrollIntoView({behavior:'smooth'})">Pro'ya Geç</button>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist" id="waitlist-section">
+  <h2>Sıradaki<br><em>Sen misin?</em></h2>
+  <p>Erken erişim listesine katıl, ilk ay %50 indirimli kullan.</p>
+  <div class="waitlist-form" id="waitlistForm">
+    <input type="email" id="emailInput" placeholder="email@adresin.com" />
+    <button onclick="submitWaitlist()">Listeye Gir</button>
+  </div>
+  <div class="success-msg" id="successMsg">🔥 Listeye Girdin! Yakında görüşürüz.</div>
+  <p class="waitlist-note">Spam yok. İstediğin zaman çıkabilirsin.</p>
+
+<script>
+  function submitWaitlist() {
+    const email = document.getElementById('emailInput').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailInput').style.borderColor = '#ff2d55';
+      return;
+    }
+    window.open('https://tally.so/r/6874bJ?email=' + encodeURIComponent(email), '_blank');
+    document.getElementById('waitlistForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }
+</script>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Tik<span>Patla</span></div>
+  <div class="footer-note">© 2026 TikPatla — TikTok'ta Patlamak Şans İşi Değil</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const trail = document.getElementById('cursorTrail');
+  document.addEventListener('mousemove', (e) => {
+    cursor.style.left = e.clientX - 6 + 'px';
+    cursor.style.top = e.clientY - 6 + 'px';
+    setTimeout(() => {
+      trail.style.left = e.clientX - 18 + 'px';
+      trail.style.top = e.clientY - 18 + 'px';
+    }, 80);
+  });
+
+  // Scroll animations
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  fadeEls.forEach(el => observer.observe(el));
+
+  // Waitlist
+  function submitWaitlist() {
+    const email = document.getElementById('emailInput').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailInput').style.borderColor = '#ff2d55';
+      return;
+    }
+    document.getElementById('waitlistForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }
+
+  // Hero parallax
+  window.addEventListener('scroll', () => {
+    const bgText = document.querySelector('.hero-bg-text');
+    if (bgText) {
+      bgText.style.transform = `translate(-50%, calc(-50% + ${window.scrollY * 0.3}px))`;
+    }
+  });
+</script>
+</body>
+</html>
